@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Minesweeper.Test
+namespace Compilers.Ast
 {
     public abstract class Node : INode
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Minesweeper.Test
+namespace Compilers.Ast
 {
     public class VarDeclarationNode : Node
     {

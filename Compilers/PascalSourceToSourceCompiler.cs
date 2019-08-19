@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Minesweeper.Test.Symbols;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 
-namespace Minesweeper.Test.Tests
+namespace Compilers
 {
     public class PascalSourceToSourceCompiler : IPascalNodeVisitor<string>
     {

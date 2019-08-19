@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minesweeper.Test
+namespace Compilers.MathParser
 {
     public class MathParserTree : IMathParser
     {

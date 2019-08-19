@@ -1,4 +1,6 @@
-﻿namespace Minesweeper.Test
+﻿using Compilers.Ast;
+
+namespace Compilers.Interpreter
 {
     public static class PascalNodeVisitorExtension
     {

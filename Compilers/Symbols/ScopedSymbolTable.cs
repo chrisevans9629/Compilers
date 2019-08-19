@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Compilers.Ast;
 
-namespace Minesweeper.Test.Symbols
+namespace Compilers.Symbols
 {
 
     

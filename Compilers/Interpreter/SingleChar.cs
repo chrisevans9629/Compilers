@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Minesweeper.Test
+﻿namespace Compilers.Interpreter
 {
 
     public class SingleChar : Component

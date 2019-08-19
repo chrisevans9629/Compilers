@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 using FluentAssertions;
 using FSharp.Compiler;
 using FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
-using Minesweeper.Test.Symbols;
 using NUnit.Framework;
 
 namespace Minesweeper.Test.Tests

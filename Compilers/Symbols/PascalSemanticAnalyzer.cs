@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Compilers.Ast;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test.Symbols
+namespace Compilers.Symbols
 {
     public class PascalSemanticAnalyzer : IPascalNodeVisitor<AnnotatedNode>
     {

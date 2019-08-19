@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using AutoFixture;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 using FluentAssertions;
-using Minesweeper.Test.Symbols;
 using Moq;
 using NUnit.Framework;
 

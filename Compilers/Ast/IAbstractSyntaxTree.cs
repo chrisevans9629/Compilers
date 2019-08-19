@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test
+namespace Compilers.Ast
 {
     
     public interface IAbstractSyntaxTree

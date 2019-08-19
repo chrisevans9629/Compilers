@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test
+namespace Compilers.Ast
 {
     public class SuperBasicMathAst : AbstractSyntaxTreeBase
     {

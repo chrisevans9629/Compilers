@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Compilers.Ast;
 
-namespace Minesweeper.Test
+namespace Compilers.Interpreter
 {
     public interface IPascalNodeVisitor<T>
     {

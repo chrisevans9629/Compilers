@@ -1,4 +1,6 @@
-﻿namespace Minesweeper.Test
+﻿using Compilers.MathParser;
+
+namespace Compilers.Interpreter
 {
     public abstract class NumberOperator : Operator
     {

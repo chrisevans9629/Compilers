@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minesweeper.Test
+namespace Compilers.Interpreter
 {
     public class HaltException : RuntimeException
     {

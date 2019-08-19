@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Minesweeper.Test;
+using Compilers.Ast;
 
-namespace Minesweeper.Test
+namespace Compilers.Interpreter
 {
     public class PascalResult<T>
     {

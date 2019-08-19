@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test
+namespace Compilers.Ast
 {
     public abstract class EqualExpression : ExpressionNode
     {

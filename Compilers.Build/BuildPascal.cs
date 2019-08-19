@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Minesweeper.Test;
-using Minesweeper.Test.Symbols;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 
 namespace Compilers.Build
 {

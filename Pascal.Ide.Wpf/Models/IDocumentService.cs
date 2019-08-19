@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
-using Minesweeper.Test;
+using Compilers.Interpreter;
 using Pascal.Ide.Wpf.Models;
 using Color = System.Drawing.Color;
 

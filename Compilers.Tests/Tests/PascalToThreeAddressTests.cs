@@ -1,4 +1,7 @@
-﻿using Minesweeper.Test.Symbols;
+﻿using Compilers;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 using NUnit.Framework;
 
 namespace Minesweeper.Test.Tests

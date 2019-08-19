@@ -104,6 +104,12 @@
     <PackageReference Include="FCTB">
       <Version>2.16.24</Version>
     </PackageReference>
+    <PackageReference Include="Prism.Core">
+      <Version>7.2.0.1367</Version>
+    </PackageReference>
+    <PackageReference Include="Prism.Wpf">
+      <Version>7.2.0.1367</Version>
+    </PackageReference>
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="1.1.14" />
     <PackageReference Include="akavache">
       <Version>6.5.20</Version>
@@ -112,6 +118,12 @@
     <PackageReference Include="System.Reactive">
       <Version>4.1.6</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Compilers\Compilers.csproj">
+      <Project>{b9a9dd34-43aa-4eab-b38d-5616aa00dfcd}</Project>
+      <Name>Compilers</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

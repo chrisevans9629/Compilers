@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Minesweeper.Test
+﻿namespace Compilers.Interpreter
 {
     //public class NumberParser
     //{

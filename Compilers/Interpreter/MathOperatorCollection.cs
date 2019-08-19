@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Compilers.MathParser;
 
-namespace Minesweeper.Test
+namespace Compilers.Interpreter
 {
     public class MathOperatorCollection
     {

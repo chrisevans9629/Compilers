@@ -5,9 +5,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using Akavache;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 using Microsoft.Win32;
-using Minesweeper.Test;
-using Minesweeper.Test.Symbols;
 using Pascal.Ide.Wpf.Models;
 using Pascal.Ide.Wpf.Views;
 using Prism.Commands;
@@ -74,7 +75,7 @@ namespace Pascal.Ide.Wpf.ViewModels
                 new HighlightParameters()
                 {
                     Color = Color.LightSkyBlue,
-                    Filter = item => Minesweeper.Test.PascalTerms.Reservations.ContainsKey(item.Token.Name)
+                    Filter = item => PascalTerms.Reservations.ContainsKey(item.Token.Name)
                 },
                 new HighlightParameters()
                 {

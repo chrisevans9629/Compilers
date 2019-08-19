@@ -1,4 +1,4 @@
-﻿namespace Minesweeper.Test
+﻿namespace Compilers.MathParser
 {
     public interface IMathParser
     {

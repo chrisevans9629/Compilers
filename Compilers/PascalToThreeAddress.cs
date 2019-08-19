@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Compilers.Ast;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test.Tests
+namespace Compilers
 {
     public class ThreeAddressCollection
     {

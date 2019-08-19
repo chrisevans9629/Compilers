@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Compilers.Ast;
+using Compilers.Interpreter;
+using Compilers.Symbols;
 using FluentAssertions;
-using Minesweeper.Test.Symbols;
 using NUnit.Framework;
 
 namespace Minesweeper.Test.Tests

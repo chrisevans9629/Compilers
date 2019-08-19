@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Compilers.Ast;
+using Compilers.Interpreter;
 using FluentAssertions;
 using NUnit.Framework;
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Pascal.Ide.Wpf.ViewModels"
         xmlns:fctb="clr-namespace:FastColoredTextBoxNS;assembly=FastColoredTextBox"
-        xmlns:test="clr-namespace:Minesweeper.Test;assembly=Compilers"
+        xmlns:ast="clr-namespace:Compilers.Ast;assembly=Compilers"
         mc:Ignorable="d"
         prism:ViewModelLocator.AutoWireViewModel="True"
         Title="{Binding Title}" WindowState="Maximized" Background="{StaticResource BackgroundColor}"
@@ -48,7 +48,7 @@
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="test:Node" ItemsSource="{Binding Children}">
+                        <HierarchicalDataTemplate DataType="ast:Node" ItemsSource="{Binding Children}">
                             <Label Content="{Binding GetTypeName}"></Label>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>

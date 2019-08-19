@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Minesweeper.Test.Symbols;
+using Compilers.Ast;
+using Compilers.Symbols;
 
-namespace Minesweeper.Test
+namespace Compilers.Interpreter
 {
     public class PascalToCSharp : PascalNodeVisitor<string>
     {

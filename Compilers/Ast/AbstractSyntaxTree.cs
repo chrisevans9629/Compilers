@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Minesweeper.Test
+﻿namespace Compilers.Ast
 {
         //public class AbstractSyntaxTree : IAbstractSyntaxTree
         //{

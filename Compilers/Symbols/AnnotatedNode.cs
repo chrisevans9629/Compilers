@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Compilers.Ast;
 
-namespace Minesweeper.Test.Symbols
+namespace Compilers.Symbols
 {
     public class AnnotatedNode
     {

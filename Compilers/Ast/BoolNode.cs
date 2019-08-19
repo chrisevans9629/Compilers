@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test
+namespace Compilers.Ast
 {
     public class BoolNode : ExpressionNode
     {

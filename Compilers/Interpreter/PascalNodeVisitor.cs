@@ -1,6 +1,7 @@
 ﻿using System;
+using Compilers.Ast;
 
-namespace Minesweeper.Test
+namespace Compilers.Interpreter
 {
     public abstract class PascalNodeVisitor<T> : IPascalNodeVisitor<T>
     {

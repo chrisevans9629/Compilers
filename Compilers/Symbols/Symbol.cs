@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Compilers.Interpreter;
 
-namespace Minesweeper.Test.Symbols
+namespace Compilers.Symbols
 {
     public class Symbol
     {
