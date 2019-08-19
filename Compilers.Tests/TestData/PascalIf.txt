@@ -1,0 +1,7 @@
+﻿program test;
+var x : integer;
+begin
+	x := 10;
+	if x = 10 then x := 5
+	else x := 15
+end.

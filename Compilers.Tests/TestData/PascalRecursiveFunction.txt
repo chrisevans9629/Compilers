@@ -1,0 +1,17 @@
+﻿program test;
+var x : integer;
+	function Add(y,x:integer) : integer;
+	begin
+		Add := y + x;
+	end;
+function Summation (num : integer) : integer;
+begin
+  if num = 1 
+  then Summation := 1
+  else Summation := Summation(num-1) + num
+end;
+begin
+	x := 0;
+	x := Summation(3);
+end.
+

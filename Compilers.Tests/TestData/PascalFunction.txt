@@ -1,0 +1,10 @@
+﻿program test;
+var x : integer;
+	function Add(y,x:integer) : integer;
+	begin
+		Add := y + x;
+	end;
+begin
+	x := 0;
+	x := Add(10,10);
+end.
