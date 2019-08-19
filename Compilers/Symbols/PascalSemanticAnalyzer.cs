@@ -16,6 +16,7 @@ namespace Compilers.Symbols
 
             var global = new ScopedSymbolTable("Global", levelZero, _logger);
             CurrentScope = global;
+            programNode.Block.Annotations.Add("Main", null);
             VisitBlock(programNode.Block);
             CurrentScope = global;
             return new AnnotatedNode(programNode);
@@ -343,8 +344,13 @@ namespace Compilers.Symbols
 
         public AnnotatedNode VisitProcedureDeclaration(ProcedureDeclarationNode procedureDeclaration)
         {
+            if (CurrentScope.ScopeLevel > 1)
+            {
+                procedureDeclaration.Annotations.Add("Nested", null);
+            }
             DeclareParameters(procedureDeclaration);
             VisitBlock(procedureDeclaration.Block);
+           
             CurrentScope = CurrentScope.ParentScope;
             var procedure = new ProcedureDeclarationSymbol(procedureDeclaration.Name, procedureDeclaration.Parameters);
             CurrentScope.Define(procedure);
@@ -360,6 +366,10 @@ namespace Compilers.Symbols
         {
             var procedure = new FunctionDeclarationSymbol(procedureDeclaration.Name, procedureDeclaration.Parameters, CurrentScope.LookupSymbol(procedureDeclaration.ReturnType.TypeValue, true));
             CurrentScope.Define(procedure);
+            if (CurrentScope.ScopeLevel > 1)
+            {
+                procedureDeclaration.Annotations.Add("Nested", null);
+            }
             DeclareParameters(procedureDeclaration);
             DefineVariableSymbol(procedureDeclaration.Token, procedureDeclaration.FunctionName, procedureDeclaration.ReturnType.TypeValue);
             VisitBlock(procedureDeclaration.Block);

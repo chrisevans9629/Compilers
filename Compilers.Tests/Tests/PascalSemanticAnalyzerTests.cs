@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Compilers.Ast;
 using Compilers.Interpreter;
 using Compilers.Symbols;
@@ -67,6 +68,129 @@ end.")]
         public void AnalyzeWithMultipleErrors_Should_NotStackoverflow(string input)
         {
             Assert.Throws<ParserException>(() => CheckSyntax(input));
+        }
+
+
+        [Test]
+        public void NestedFunction_Should_HaveNestedAnnotation()
+        {
+            var input = @"
+program test; 
+function write() : string;
+    function write2() : string;
+    begin
+        write2 := 'asdf';
+    end;
+begin
+    write := 'test';
+end;
+begin 
+end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>()
+                .Which.Block
+                .Declarations.First()
+                .Should()
+                .BeOfType<FunctionDeclarationNode>()
+                .Which
+                .Block.Declarations
+                .First().Should().BeOfType<FunctionDeclarationNode>().Which.Annotations.Should().ContainKey("Nested");
+        }
+
+        [Test]
+        public void NestedProcedure_Should_HaveNestedAnnotation()
+        {
+            var input = @"
+program test; 
+function write() : string;
+    procedure write2();
+    begin
+    end;
+begin
+    write := 'test';
+end;
+begin 
+end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>()
+                .Which.Block
+                .Declarations.First()
+                .Should()
+                .BeOfType<FunctionDeclarationNode>()
+                .Which
+                .Block.Declarations
+                .First().Should().BeOfType<ProcedureDeclarationNode>().Which.Annotations.Should().ContainKey("Nested");
+        }
+
+        [Test]
+        public void Procedure_Should_NotHaveNestedAnnotation()
+        {
+            var input = @"
+program test; 
+procedure write();
+    procedure write2();
+    begin
+    end;
+begin
+end;
+begin 
+end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>()
+                .Which.Block
+                .Declarations.First()
+                .Should()
+                .BeOfType<ProcedureDeclarationNode>()
+                .Which.Annotations.Should().NotContainKey("Nested");
+        }
+
+        [Test]
+        public void Function_Should_NotHaveNestedAnnotation()
+        {
+            var input = @"
+program test; 
+function write() : string;
+    procedure write2();
+    begin
+    end;
+begin
+    write := 'test';
+end;
+begin 
+end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>()
+                .Which.Block
+                .Declarations.First()
+                .Should()
+                .BeOfType<FunctionDeclarationNode>()
+                .Which.Annotations.Should().NotContainKey("Nested");
+        }
+
+        [Test]
+        public void MainProgram_Should_HaveAnnotation()
+        {
+            var input = @"program test;begin end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>().Which.Block.Annotations.Should().ContainKey("Main");
+        }
+
+        private Node CheckSyntaxAndReturnNode(string input)
+        {
+            var tokens = this.lexer.Tokenize(input);
+            var node = ast.Evaluate(tokens);
+            analyzer.CheckSyntax(node);
+            return node;
+        }
+
+        [Test]
+        public void Procedure_Should_NotHaveMainAnnotation()
+        {
+            var input = @"program test;procedure test(); begin end; begin end.";
+            var node = CheckSyntaxAndReturnNode(input);
+
+            node.Should().BeOfType<PascalProgramNode>().Which.Block.Declarations.First().Should()
+                .BeOfType<ProcedureDeclarationNode>().Which.Block.Annotations.Should().NotContainKey("Main");
         }
 
         [Test]

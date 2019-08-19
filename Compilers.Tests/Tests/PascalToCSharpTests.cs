@@ -51,6 +51,35 @@ public static class test
         Console.WriteLine(" + "\"hello world!\"" + @");
     }
 }")]
+        [TestCase(@"
+program HelloWorld;
+procedure test(str :string);
+    procedure write(str : string);
+    begin
+        writeln(str);
+    end;
+begin
+    write(str);
+end;
+begin
+    test('Hello, world!');
+end.", @"using System;
+public static class HelloWorld
+{
+    void test(string str)
+    {
+	    void write(string str1) 
+	    {
+		    Console.WriteLine(str1);
+	    };
+	    write(str);
+    }
+    public static void Main()
+    {
+	    test(" +"\"Hello, world!\"" + @");
+    }
+}
+")]
         public void PascalInput_Should_CreateOutput(string input, string output)
         {
             var tokens = lexer.Tokenize(input);
