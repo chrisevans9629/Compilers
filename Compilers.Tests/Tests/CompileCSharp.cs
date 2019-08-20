@@ -1,8 +1,16 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 
 namespace Minesweeper.Test.Tests
 {
+    public class CompilerSettings : ICompilerSettings
+    {
+        public string CompilerFullPath =>
+            @"c:\Program Files (x86)\Microsoft Visual Studio\2019\professional\MSBuild\Current\Bin\Roslyn";
+        public int CompilerServerTimeToLive { get; }
+    }
+
     public class CompileCSharp
     {
         public static bool CompileExecutable(string sourceName, string appName)
@@ -14,7 +22,9 @@ namespace Minesweeper.Test.Tests
             // Select the code provider based on the input file extension.
             //if (sourceFile.Extension.ToUpper(CultureInfo.InvariantCulture) == ".CS")
             //{
-            provider = CodeDomProvider.CreateProvider("CSharp");
+            //provider = CodeDomProvider.CreateProvider("CSharp");
+            
+            provider = new CSharpCodeProvider(new CompilerSettings());
             //}
             //else if (sourceFile.Extension.ToUpper(CultureInfo.InvariantCulture) == ".VB")
             //{
@@ -35,7 +45,7 @@ namespace Minesweeper.Test.Tests
                 String exeName = $@"{System.Environment.CurrentDirectory}\{appName}.exe";
 
                 CompilerParameters cp = new CompilerParameters();
-
+                
                 // Generate an executable instead of 
                 // a class library.
                 cp.GenerateExecutable = true;

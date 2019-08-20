@@ -19,6 +19,8 @@ namespace Compilers.Symbols
             programNode.Block.Annotations.Add("Main", null);
             VisitBlock(programNode.Block);
             CurrentScope = global;
+            programNode.Block.Annotations.Add("SymbolTable", global);
+
             return new AnnotatedNode(programNode);
         }
 
@@ -140,7 +142,7 @@ namespace Compilers.Symbols
 
         public AnnotatedNode VisitNegationOperator(NegationOperator negate)
         {
-           return VisitNode(negate.Right);
+            return VisitNode(negate.Right);
         }
 
         public AnnotatedNode VisitIfStatement(IfStatementNode ifStatement)
@@ -198,16 +200,16 @@ namespace Compilers.Symbols
             {
                 if (a.Name == b.Name)
                 {
-                    return new AnnotatedNode(nodeForLog){Symbol = a }; ;
+                    return new AnnotatedNode(nodeForLog) { Symbol = a }; ;
                 }
 
                 if (a.Conversions.Contains(b.Name) && twoWayConversion)
                 {
-                    return new AnnotatedNode(nodeForLog){Symbol = b }; ;
+                    return new AnnotatedNode(nodeForLog) { Symbol = b }; ;
                 }
                 if (b.Conversions.Contains(a.Name))
                 {
-                    return new AnnotatedNode(nodeForLog){Symbol = a };
+                    return new AnnotatedNode(nodeForLog) { Symbol = a };
                 }
 
 
@@ -228,6 +230,7 @@ namespace Compilers.Symbols
             VisitNode(whileLoop.BoolExpression);
             CurrentScope = new ScopedSymbolTable("_while_", CurrentScope);
             VisitNode(whileLoop.DoStatement);
+            whileLoop.Annotations.Add("SymbolTable", CurrentScope);
             CurrentScope = CurrentScope.ParentScope;
             return new AnnotatedNode(whileLoop);
         }
@@ -235,12 +238,12 @@ namespace Compilers.Symbols
         public AnnotatedNode VisitReal(RealNode real)
         {
             //return real.Value;
-            return new AnnotatedNode(real){Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Real, true) };
+            return new AnnotatedNode(real) { Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Real, true) };
         }
 
         public AnnotatedNode VisitInteger(IntegerNode integer)
         {
-            return new AnnotatedNode(integer){Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Int, true) }; ;
+            return new AnnotatedNode(integer) { Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Int, true) }; ;
         }
 
         public AnnotatedNode VisitBinaryOperator(BinaryOperator binary)
@@ -265,11 +268,11 @@ namespace Compilers.Symbols
         {
             if (str.CurrentValue.Length == 1)
             {
-                return new AnnotatedNode(str){Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Char, true) }; ;
+                return new AnnotatedNode(str) { Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Char, true) }; ;
             }
             else
             {
-                return new AnnotatedNode(str){Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.String, true) }; ;
+                return new AnnotatedNode(str) { Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.String, true) }; ;
             }
         }
 
@@ -287,7 +290,7 @@ namespace Compilers.Symbols
                 }
             }
 
-            return new AnnotatedNode(inOperator){Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Boolean, true) }; ;
+            return new AnnotatedNode(inOperator) { Symbol = CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.Boolean, true) }; ;
         }
 
         public AnnotatedNode VisitCaseStatement(CaseStatementNode caseStatement)
@@ -334,7 +337,7 @@ namespace Compilers.Symbols
 
             //VisitNode(decNode.Value);
             var symbol = this.DefineVariableSymbol(decNode.TokenItem, decNode.ConstantName, typeName);
-            return new AnnotatedNode(decNode){Symbol = symbol};
+            return new AnnotatedNode(decNode) { Symbol = symbol };
         }
 
         public AnnotatedNode VisitPointer(PointerNode pointer)
@@ -350,7 +353,7 @@ namespace Compilers.Symbols
             }
             DeclareParameters(procedureDeclaration);
             VisitBlock(procedureDeclaration.Block);
-           
+            procedureDeclaration.Annotations.Add("SymbolTable", CurrentScope);
             CurrentScope = CurrentScope.ParentScope;
             var procedure = new ProcedureDeclarationSymbol(procedureDeclaration.Name, procedureDeclaration.Parameters);
             CurrentScope.Define(procedure);
@@ -385,10 +388,10 @@ namespace Compilers.Symbols
             {
                 pascalResult.Errors.Add(new SemanticException(ErrorCode.DoesNotReturnValue, procedureDeclaration.Token, $"Function {procedureDeclaration.FunctionName} does not return a value"));
             }
-
+            procedureDeclaration.Annotations.Add("SymbolTable", CurrentScope);
             CurrentScope = CurrentScope.ParentScope;
 
-            return new AnnotatedNode(procedureDeclaration){Symbol = procedure};
+            return new AnnotatedNode(procedureDeclaration) { Symbol = procedure };
         }
 
         public AnnotatedNode VisitBool(BoolNode boolNode)
@@ -401,7 +404,7 @@ namespace Compilers.Symbols
 
             CheckTypeMatch(listRange.TokenItem, VisitNode(listRange.FromNode), VisitNode(listRange.ToNode), listRange);
 
-            return new AnnotatedNode(listRange){Symbol = new CollectionTypeSymbol(CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.String, true)) };
+            return new AnnotatedNode(listRange) { Symbol = new CollectionTypeSymbol(CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.String, true)) };
         }
 
         public AnnotatedNode VisitListItemsExpression(ListItemsExpressionNode itemsExpressionNode)
@@ -417,7 +420,7 @@ namespace Compilers.Symbols
                 CheckTypeMatch(itemsExpressionNode.TokenItem, VisitNode(prevNode), VisitNode(stringNode), itemsExpressionNode);
                 prevNode = stringNode;
             }
-            return new AnnotatedNode(itemsExpressionNode){Symbol = new CollectionTypeSymbol(CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.String, true)) };
+            return new AnnotatedNode(itemsExpressionNode) { Symbol = new CollectionTypeSymbol(CurrentScope.LookupSymbol<BuiltInTypeSymbol>(PascalTerms.String, true)) };
         }
 
         private void DeclareParameters(DeclarationNode procedureDeclaration)
@@ -465,13 +468,13 @@ namespace Compilers.Symbols
 
             var symbol = symbols.FirstOrDefault(p => p.Parameters.Count == callCount);
 
-            return new AnnotatedNode(funCall){Symbol = symbol}; ;
+            return new AnnotatedNode(funCall) { Symbol = symbol }; ;
         }
 
 
         public AnnotatedNode VisitVariableOrFunctionCall(VariableOrFunctionCall call)
         {
-            return  VisitVariable(call);
+            return VisitVariable(call);
         }
 
         public AnnotatedNode VisitNoOp(NoOp nope)
@@ -532,7 +535,7 @@ namespace Compilers.Symbols
                 NotFound(assLeft.TokenItem, "Variable", varName);
             }
 
-            return new AnnotatedNode(assLeft){Symbol = symbol};
+            return new AnnotatedNode(assLeft) { Symbol = symbol };
         }
 
         private void NotFound(TokenItem assLeft, string type, string varName)
@@ -567,7 +570,7 @@ namespace Compilers.Symbols
         {
             var typeName = node.TypeNode.TypeValue;
             var varName = node.VarNode.VariableName;
-            return new AnnotatedNode(node){Symbol = DefineVariableSymbol(node.VarNode.TokenItem, varName, typeName) };
+            return new AnnotatedNode(node) { Symbol = DefineVariableSymbol(node.VarNode.TokenItem, varName, typeName) };
         }
 
         private VariableSymbol DefineVariableSymbol(TokenItem node, string varName, string typeName)

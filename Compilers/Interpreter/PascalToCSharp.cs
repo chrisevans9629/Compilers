@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Compilers.Ast;
 using Compilers.Symbols;
@@ -7,7 +8,7 @@ namespace Compilers.Interpreter
 {
     public class PascalToCSharp : PascalNodeVisitor<string>
     {
-        public ScopedSymbolTable CurrentScope { get; private set; }
+        //public ScopedSymbolTable CurrentScope { get; private set; }
 
         IList<string> _assembliesCalled = new List<string>();
         public override string VisitNode(Node node)
@@ -16,17 +17,28 @@ namespace Compilers.Interpreter
         }
 
         private const string Void = "void";
+        private ScopedSymbolTable current;
         public override string VisitProcedureDeclaration(ProcedureDeclarationNode procedureDeclaration)
         {
             var str = "";
             //var str = $"{AddSpaces()}public void {procedureDeclaration.ProcedureId}\r\n";
             // str += AddSpaces() + "{\r\n";
+            var symbols = procedureDeclaration.Annotations["SymbolTable"] as ScopedSymbolTable;
+            current = symbols;
             var param = "";
             for (var index = 0; index < procedureDeclaration.Parameters.Count; index++)
             {
-                var procedureDeclarationParameter = procedureDeclaration.Parameters[index];
+                var p = procedureDeclaration.Parameters[index];
+                var name = p.Declaration.VarNode.VariableName;
+                var matches = symbols.LookupSymbols<Symbol>(name, true);
+
+                if (matches.Count > 1)
+                {
+                    name = current.AddAlias(name);
+                }
+
                 param +=
-                    $"{procedureDeclarationParameter.Declaration.TypeNode.TypeValue} {procedureDeclarationParameter.Declaration.VarNode.VariableName}";
+                    $"{p.Declaration.TypeNode.TypeValue} {name}";
                 if (index != procedureDeclaration.Parameters.Count - 1)
                 {
                     param += ",";
@@ -42,11 +54,16 @@ namespace Compilers.Interpreter
                 str += $"{AddSpaces()}public static void {procedureDeclaration.ProcedureId}({param})\r\n";
             }
             //CurrentScope = new ScopedSymbolTable(procedureDeclaration.ProcedureId, CurrentScope);
-            
+
             str += VisitBlock(procedureDeclaration.Block);
 
+            if (procedureDeclaration.Annotations.ContainsKey("Nested"))
+            {
+                str = str.Remove(str.Length - 2);
+                str += ";\r\n";
+            }
             //CurrentScope = CurrentScope.ParentScope;
-
+            current = symbols.ParentScope;
             //str += AddSpaces() + "}\r\n";
             return str;
         }
@@ -71,31 +88,31 @@ namespace Compilers.Interpreter
                 {
                     _assembliesCalled.Add(assembly);
                 }
-                
+
                 return $"{AddSpaces()}Console.WriteLine({param});\r\n";
             }
 
             return $"{AddSpaces()}{procedureCall.ProcedureName}({param});\r\n";
         }
-        
+
 
         public override string VisitBinaryOperator(BinaryOperator binary)
         {
             return $"{VisitNode(binary.Left)} {binary.Name} {VisitNode(binary.Right)}";
         }
-        
+
 
         public override string VisitString(StringNode str)
         {
             return "\"" + str.CurrentValue + "\"";
         }
-        
+
 
         public override string VisitBool(BoolNode boolNode)
         {
             return boolNode.Value.ToString();
         }
-        
+
         public override string VisitVarDeclaration(VarDeclarationNode varDeclaration)
         {
             var typeValue = varDeclaration.TypeNode.TypeValue.ToUpper();
@@ -118,9 +135,9 @@ namespace Compilers.Interpreter
 
         public override string VisitProgram(PascalProgramNode program)
         {
-            var zero = new ScopedSymbolTable(program.ProgramName);
-            PascalSemanticAnalyzer.DefineBuiltIns(zero);
-            CurrentScope = zero;
+            // var zero = new ScopedSymbolTable(program.ProgramName);
+            // PascalSemanticAnalyzer.DefineBuiltIns(zero);
+            //CurrentScope = zero;
             var block = "{\r\n";
             indentLevel++;
             block += VisitBlock(program.Block);
@@ -173,16 +190,16 @@ namespace Compilers.Interpreter
             else
             {
                 str += AddSpaces() + "{\r\n";
-               // CurrentScope = new ScopedSymbolTable(name, CurrentScope);
-               indentLevel++;
+                // CurrentScope = new ScopedSymbolTable(name, CurrentScope);
+                indentLevel++;
                 str += VisitNodes(block.Declarations);
                 str += VisitCompoundStatement(block.CompoundStatement);
                 //CurrentScope = CurrentScope.ParentScope;
                 indentLevel--;
                 str += AddSpaces() + "}\r\n";
             }
-           // var str = AddSpaces() + "{\r\n";
-           // str += $"{VisitNodes(block.Declarations)}{VisitCompoundStatement(block.CompoundStatement)}";
+            // var str = AddSpaces() + "{\r\n";
+            // str += $"{VisitNodes(block.Declarations)}{VisitCompoundStatement(block.CompoundStatement)}";
             //str += AddSpaces() + "}\r\n";
             return str;
         }
@@ -203,7 +220,7 @@ namespace Compilers.Interpreter
 
         public override string VisitVariableOrFunctionCall(VariableOrFunctionCall call)
         {
-            return call.VariableName;
+            return current.GetName(call.VariableName);
         }
 
         private string VisitNodes(IList<Node> blockDeclarations)

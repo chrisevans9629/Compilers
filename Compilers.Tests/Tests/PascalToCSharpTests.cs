@@ -68,24 +68,24 @@ public static class HelloWorld
 {
     public static void test(string str)
     {
-	    void write(string str1) 
-	    {
-		    Console.WriteLine(str1);
-	    };
-	    write(str);
+        void write(string str1)
+        {
+            Console.WriteLine(str1);
+        };
+        write(str);
     }
     public static void Main()
     {
-	    test(" +"\"Hello, world!\"" + @");
+        test(" +"\"Hello, world!\"" + @");
     }
-}
-")]
+}")]
         public void PascalInput_Should_CreateOutput(string input, string output)
         {
-            var tokens = lexer.Tokenize(input);
+            var tokens = lexer.Tokenize(input.Trim());
             var node = ast.Evaluate(tokens);
             table.CheckSyntax(node);
-            cSharp.VisitNode(node).Should().Be(output);
+            var result = cSharp.VisitNode(node).Trim();
+            result.Should().Be(output.Trim());
 
             CompileCSharp.CompileExecutable(output, "test").Should().BeTrue();
         }

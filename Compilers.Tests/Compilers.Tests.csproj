@@ -48,6 +48,7 @@
     <Compile Include="PascalToILAssemblyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\CompileCSharp.cs" />
+    <Compile Include="Tests\LoggerMock.cs" />
     <Compile Include="Tests\MathInterpreterTests.cs" />
     <Compile Include="Tests\MathParserTests.cs" />
     <Compile Include="Tests\MathSimpleTreeTests.cs" />

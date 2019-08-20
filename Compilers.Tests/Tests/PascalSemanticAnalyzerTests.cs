@@ -9,16 +9,6 @@ using NUnit.Framework;
 
 namespace Minesweeper.Test.Tests
 {
-
-    public class LoggerMock : Logger
-    {
-        public List<string> Calls { get; set; } = new List<string>();
-        public override void Log(object obj)
-        {
-            Calls.Add(obj?.ToString());
-            base.Log(obj);
-        }
-    }
     [TestFixture]
     public class PascalSemanticAnalyzerTests
     {
@@ -143,6 +133,27 @@ end.";
                 .BeOfType<ProcedureDeclarationNode>()
                 .Which.Annotations.Should().NotContainKey("Nested");
         }
+        [Test]
+        public void Procedure_Should_HaveSymbolTable()
+        {
+            var input = @"
+program test; 
+procedure write();
+    procedure write2();
+    begin
+    end;
+begin
+end;
+begin 
+end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>()
+                .Which.Block
+                .Declarations.First()
+                .Should()
+                .BeOfType<ProcedureDeclarationNode>()
+                .Which.Annotations.Should().ContainKey("SymbolTable").WhichValue.Should().BeOfType<ScopedSymbolTable>();
+        }
 
         [Test]
         public void Function_Should_NotHaveNestedAnnotation()
@@ -165,6 +176,36 @@ end.";
                 .Should()
                 .BeOfType<FunctionDeclarationNode>()
                 .Which.Annotations.Should().NotContainKey("Nested");
+        }
+        [Test]
+        public void Function_Should_HaveSymbolTable()
+        {
+            var input = @"
+program test; 
+function write() : string;
+    procedure write2();
+    begin
+    end;
+begin
+    write := 'test';
+end;
+begin 
+end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>()
+                .Which.Block
+                .Declarations.First()
+                .Should()
+                .BeOfType<FunctionDeclarationNode>()
+                .Which.Annotations.Should().ContainKey("SymbolTable").WhichValue.Should().BeOfType<ScopedSymbolTable>();
+        }
+
+        [Test]
+        public void Program_Should_HaveSymbolTable()
+        {
+            var input = @"program test;begin end.";
+            var node = CheckSyntaxAndReturnNode(input);
+            node.Should().BeOfType<PascalProgramNode>().Which.Block.Annotations.Should().ContainKey("SymbolTable").WhichValue.Should().BeOfType<ScopedSymbolTable>();
         }
 
         [Test]

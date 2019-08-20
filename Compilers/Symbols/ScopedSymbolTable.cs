@@ -98,5 +98,25 @@ namespace Compilers.Symbols
 
             return syms;
         }
+
+        private int aliasCount = 1;
+        private Dictionary<string, string> aliases = new Dictionary<string, string>();
+
+        public string GetName(string name)
+        {
+            if (aliases.ContainsKey(name))
+            {
+                return aliases[name];
+            }
+
+            return name;
+        }
+        public string AddAlias(string name)
+        {
+            var alias = name + aliasCount;
+            aliases.Add(name, alias);
+            aliasCount++;
+            return alias;
+        }
     }
 }
