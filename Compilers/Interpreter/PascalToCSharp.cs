@@ -9,7 +9,7 @@ namespace Compilers.Interpreter
     public class PascalToCSharp : PascalNodeVisitor<string>
     {
         //public ScopedSymbolTable CurrentScope { get; private set; }
-
+        CSharpTypesConverter typesConverter = new CSharpTypesConverter();
         IList<string> _assembliesCalled = new List<string>();
         public override string VisitNode(Node node)
         {
@@ -18,14 +18,69 @@ namespace Compilers.Interpreter
 
         private const string Void = "void";
         private ScopedSymbolTable current;
-        public override string VisitProcedureDeclaration(ProcedureDeclarationNode procedureDeclaration)
+        public override string VisitInteger(IntegerNode integer)
+        {
+            return integer.Value.ToString();
+        }
+
+        
+
+        public override string VisitEqualExpression(EqualExpression equalExpression)
+        {
+            return $"{VisitNode(equalExpression.Left)} == {VisitNode(equalExpression.Right)}";
+        }
+
+        public override string VisitIfStatement(IfStatementNode ifStatement)
         {
             var str = "";
+            str += $"{AddSpaces()}if({VisitNode(ifStatement.IfCheck)})\r\n";
+            str += $"{VisitNode(ifStatement.IfTrue)}";
+            if (ifStatement.IfFalse != null)
+            {
+                str += $"{AddSpaces()}else\r\n";
+                str += $"{VisitNode(ifStatement.IfFalse)}\r\n";
+            }
+
+            return str;
+        }
+
+        public override string VisitFunctionDeclaration(FunctionDeclarationNode faDeclarationNode)
+        {
+            var str = "";
+            var procedureDeclaration = faDeclarationNode;
             //var str = $"{AddSpaces()}public void {procedureDeclaration.ProcedureId}\r\n";
             // str += AddSpaces() + "{\r\n";
             var symbols = procedureDeclaration.Annotations["SymbolTable"] as ScopedSymbolTable;
             current = symbols;
-            var param = "";
+            var param = CreateParameters(procedureDeclaration, symbols);
+
+            var type = typesConverter.GetTypeName(procedureDeclaration.ReturnType.TypeValue);
+            if (procedureDeclaration.Annotations.ContainsKey("Nested"))
+            {
+                str += $"{AddSpaces()}{type} {procedureDeclaration.FunctionName}({param})\r\n";
+            }
+            else
+            {
+                str += $"{AddSpaces()}public static {type} {procedureDeclaration.FunctionName}({param})\r\n";
+            }
+            //CurrentScope = new ScopedSymbolTable(procedureDeclaration.ProcedureId, CurrentScope);
+
+            str += VisitBlock(procedureDeclaration.Block);
+
+            if (procedureDeclaration.Annotations.ContainsKey("Nested"))
+            {
+                str = str.Remove(str.Length - 2);
+                str += ";\r\n";
+            }
+            //CurrentScope = CurrentScope.ParentScope;
+            current = symbols.ParentScope;
+            //str += AddSpaces() + "}\r\n";
+            return str;
+        }
+
+        private string CreateParameters(DeclarationNode procedureDeclaration, ScopedSymbolTable symbols)
+        {
+            string param = "";
             for (var index = 0; index < procedureDeclaration.Parameters.Count; index++)
             {
                 var p = procedureDeclaration.Parameters[index];
@@ -38,12 +93,24 @@ namespace Compilers.Interpreter
                 }
 
                 param +=
-                    $"{p.Declaration.TypeNode.TypeValue} {name}";
+                    $"{typesConverter.GetTypeName(p.Declaration.TypeNode.TypeValue)} {name}";
                 if (index != procedureDeclaration.Parameters.Count - 1)
                 {
                     param += ",";
                 }
             }
+
+            return param;
+        }
+
+        public override string VisitProcedureDeclaration(ProcedureDeclarationNode procedureDeclaration)
+        {
+            var str = "";
+            //var str = $"{AddSpaces()}public void {procedureDeclaration.ProcedureId}\r\n";
+            // str += AddSpaces() + "{\r\n";
+            var symbols = procedureDeclaration.Annotations["SymbolTable"] as ScopedSymbolTable;
+            current = symbols;
+            var param = CreateParameters(procedureDeclaration, symbols);
 
             if (procedureDeclaration.Annotations.ContainsKey("Nested"))
             {
@@ -95,7 +162,33 @@ namespace Compilers.Interpreter
             return $"{AddSpaces()}{procedureCall.ProcedureName}({param});\r\n";
         }
 
+        public override string VisitFunctionCall(CallNode functionCall)
+        {
+            var procedureCall = functionCall;
+            var param = "";
+            if (procedureCall.Parameters.Any())
+            {
+                foreach (var procedureCallParameter in procedureCall.Parameters)
+                {
+                    param += VisitNode(procedureCallParameter);
+                    param += ",";
+                }
 
+                param = param.Remove(param.Length - 1);
+            }
+            //if (procedureCall.Name.ToUpper() == "WRITELN")
+            //{
+            //    var assembly = "using System;";
+            //    if (_assembliesCalled.Contains(assembly) != true)
+            //    {
+            //        _assembliesCalled.Add(assembly);
+            //    }
+
+            //    return $"{AddSpaces()}Console.WriteLine({param});\r\n";
+            //}
+
+            return $"{AddSpaces()}{procedureCall.Name}({param});\r\n";
+        }
         public override string VisitBinaryOperator(BinaryOperator binary)
         {
             return $"{VisitNode(binary.Left)} {binary.Name} {VisitNode(binary.Right)}";
@@ -215,9 +308,13 @@ namespace Compilers.Interpreter
 
         public override string VisitAssignment(AssignmentNode assignment)
         {
-            return $"{AddSpaces()}{VisitNode(assignment.Left)} = {VisitNode(assignment.Right)};\r\n";
+            if (assignment.Annotations.ContainsKey("Return"))
+            {
+                return $"{AddSpaces()}return {VisitNode(assignment.Right)};\r\n";
+            }
+            return $"{AddSpaces()}{VisitVariableOrFunctionCall(assignment.Left)} = {VisitNode(assignment.Right)};\r\n";
         }
-
+        
         public override string VisitVariableOrFunctionCall(VariableOrFunctionCall call)
         {
             return current.GetName(call.VariableName);

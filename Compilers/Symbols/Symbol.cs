@@ -5,6 +5,7 @@ namespace Compilers.Symbols
 {
     public class Symbol
     {
+        public Dictionary<string,object> Annotations { get; set; } = new Dictionary<string, object>();
         public string Name { get; protected set; }
         public Symbol Type { get; protected set; }
 

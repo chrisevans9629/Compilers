@@ -1,5 +1,7 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Diagnostics;
+using System.IO;
 using Microsoft.CodeDom.Providers.DotNetCompilerPlatform;
 
 namespace Minesweeper.Test.Tests
@@ -13,60 +15,58 @@ namespace Minesweeper.Test.Tests
 
     public class CompileCSharp
     {
+        public static bool CompileExecutable2(string sourceCode, string appName)
+        {
+            String exeName = $@"{System.Environment.CurrentDirectory}\{appName}.exe";
+            var tempFile = Path.GetTempFileName();
+            var tempSource = Path.ChangeExtension(tempFile, ".cs");
+
+            File.WriteAllText(tempSource, sourceCode);
+            var settings = new CompilerSettings();
+
+            var csc = Path.Combine(settings.CompilerFullPath, "csc.exe");
+
+            var process = new Process( );
+            process.StartInfo.Arguments = $"/target:exe /out:{exeName} {tempSource}";
+            process.StartInfo.FileName = csc;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardError = true;
+            process.Start();
+            process.WaitForExit();
+
+            var output = process.StandardError.ReadToEnd();
+            Console.Write(output);
+            if (process.ExitCode != 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static bool CompileExecutable(string sourceName, string appName)
         {
-            //FileInfo sourceFile = new FileInfo(sourceName);
+            String exeName = $@"{System.Environment.CurrentDirectory}\{appName}.exe";
+
             CodeDomProvider provider = null;
             bool compileOk = false;
 
-            // Select the code provider based on the input file extension.
-            //if (sourceFile.Extension.ToUpper(CultureInfo.InvariantCulture) == ".CS")
-            //{
-            //provider = CodeDomProvider.CreateProvider("CSharp");
-            
             provider = new CSharpCodeProvider(new CompilerSettings());
-            //}
-            //else if (sourceFile.Extension.ToUpper(CultureInfo.InvariantCulture) == ".VB")
-            //{
-            //    provider = CodeDomProvider.CreateProvider("VisualBasic");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Source file must have a .cs or .vb extension");
-            //}
+
 
             if (provider != null)
             {
 
-                // Format the executable file name.
-                // Build the output assembly path using the current directory
-                // and <source>_cs.exe or <source>_vb.exe.
-
-                String exeName = $@"{System.Environment.CurrentDirectory}\{appName}.exe";
-
                 CompilerParameters cp = new CompilerParameters();
-                
-                // Generate an executable instead of 
-                // a class library.
                 cp.GenerateExecutable = true;
-
-                // Specify the assembly file name to generate.
                 cp.OutputAssembly = exeName;
-
-                // Save the assembly as a physical file.
                 cp.GenerateInMemory = false;
-
-                // Set whether to treat all warnings as errors.
                 cp.TreatWarningsAsErrors = false;
-
-                // Invoke compilation of the source file.
-
                 CompilerResults cr = provider.CompileAssemblyFromSource(cp,
                     sourceName);
 
                 if (cr.Errors.Count > 0)
                 {
-                    // Display compilation errors.
                     Console.WriteLine("Errors building {0} into {1}",
                         sourceName, cr.PathToAssembly);
                     foreach (CompilerError ce in cr.Errors)
@@ -77,17 +77,11 @@ namespace Minesweeper.Test.Tests
                 }
                 else
                 {
-                    // Display a successful compilation message.
                     Console.WriteLine("Source {0} built into {1} successfully.",
                         sourceName, cr.PathToAssembly);
                 }
 
-                // Return the results of the compilation.
-                if (cr.Errors.Count > 0)
-                {
-                    compileOk = false;
-                }
-                else
+                if (cr.Errors.Count <= 0)
                 {
                     compileOk = true;
                 }

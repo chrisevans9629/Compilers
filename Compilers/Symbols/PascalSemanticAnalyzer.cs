@@ -374,7 +374,9 @@ namespace Compilers.Symbols
                 procedureDeclaration.Annotations.Add("Nested", null);
             }
             DeclareParameters(procedureDeclaration);
-            DefineVariableSymbol(procedureDeclaration.Token, procedureDeclaration.FunctionName, procedureDeclaration.ReturnType.TypeValue);
+            var symbol = DefineVariableSymbol(procedureDeclaration.Token, procedureDeclaration.FunctionName, procedureDeclaration.ReturnType.TypeValue);
+
+            symbol.Annotations.Add("ReturnVariable", null);
             VisitBlock(procedureDeclaration.Block);
 
             var returnVariable = CurrentScope.LookupSymbol<VariableSymbol>(procedureDeclaration.FunctionName, false);
@@ -489,8 +491,14 @@ namespace Compilers.Symbols
             if (variable.Symbol is VariableSymbol v)
             {
                 v.Initialized = true;
+                if (v.Annotations.ContainsKey("ReturnVariable"))
+                {
+                    ass.Annotations.Add("Return", null);
+                }
             }
 
+            
+           
             //CheckType(ass.TokenItem, assignmentType, variable);
 
 

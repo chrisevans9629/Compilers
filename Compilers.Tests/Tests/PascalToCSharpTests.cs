@@ -79,6 +79,28 @@ public static class HelloWorld
         test(" +"\"Hello, world!\"" + @");
     }
 }")]
+        [TestCase(@"
+program HelloWorld;
+function Factorial(i : integer) : integer;
+begin
+    if i = 1 then Factorial := 1
+    else Factorial := Factorial(i-1) * i;
+end;
+begin
+    writeln(Factorial(10));
+end.", @"using System;
+public static class HelloWorld
+{
+    public static int Factorial(int i)
+    {
+        if(i == 1) return i;
+        else return Factorial(i-1) * i;
+    }
+    public static void Main()
+    {
+        Console.WriteLine(Factorial(10));
+    }
+}")]
         public void PascalInput_Should_CreateOutput(string input, string output)
         {
             var tokens = lexer.Tokenize(input.Trim());
@@ -87,7 +109,7 @@ public static class HelloWorld
             var result = cSharp.VisitNode(node).Trim();
             result.Should().Be(output.Trim());
 
-            CompileCSharp.CompileExecutable(output, "test").Should().BeTrue();
+            //CompileCSharp.CompileExecutable2(output, "test").Should().BeTrue();
         }
     }
 }
