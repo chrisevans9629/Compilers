@@ -66,7 +66,7 @@ begin
 end.", @"using System;
 public static class HelloWorld
 {
-    void test(string str)
+    public static void test(string str)
     {
 	    void write(string str1) 
 	    {

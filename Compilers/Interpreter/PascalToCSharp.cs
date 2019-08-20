@@ -7,23 +7,45 @@ namespace Compilers.Interpreter
 {
     public class PascalToCSharp : PascalNodeVisitor<string>
     {
-        private ScopedSymbolTable CurrentScope;
+        public ScopedSymbolTable CurrentScope { get; private set; }
+
         IList<string> _assembliesCalled = new List<string>();
         public override string VisitNode(Node node)
         {
             return this.VisitNodeModel(node);
         }
 
+        private const string Void = "void";
         public override string VisitProcedureDeclaration(ProcedureDeclarationNode procedureDeclaration)
         {
-            var str = $"{AddSpaces()}public void {procedureDeclaration.ProcedureId}\r\n";
-           // str += AddSpaces() + "{\r\n";
+            var str = "";
+            //var str = $"{AddSpaces()}public void {procedureDeclaration.ProcedureId}\r\n";
+            // str += AddSpaces() + "{\r\n";
+            var param = "";
+            for (var index = 0; index < procedureDeclaration.Parameters.Count; index++)
+            {
+                var procedureDeclarationParameter = procedureDeclaration.Parameters[index];
+                param +=
+                    $"{procedureDeclarationParameter.Declaration.TypeNode.TypeValue} {procedureDeclarationParameter.Declaration.VarNode.VariableName}";
+                if (index != procedureDeclaration.Parameters.Count - 1)
+                {
+                    param += ",";
+                }
+            }
 
-            CurrentScope = new ScopedSymbolTable(procedureDeclaration.ProcedureId, CurrentScope);
+            if (procedureDeclaration.Annotations.ContainsKey("Nested"))
+            {
+                str += $"{AddSpaces()}void {procedureDeclaration.ProcedureId}({param})\r\n";
+            }
+            else
+            {
+                str += $"{AddSpaces()}public static void {procedureDeclaration.ProcedureId}({param})\r\n";
+            }
+            //CurrentScope = new ScopedSymbolTable(procedureDeclaration.ProcedureId, CurrentScope);
+            
+            str += VisitBlock(procedureDeclaration.Block);
 
-            str += VisitNode(procedureDeclaration.Block);
-
-            CurrentScope = CurrentScope.ParentScope;
+            //CurrentScope = CurrentScope.ParentScope;
 
             //str += AddSpaces() + "}\r\n";
             return str;
@@ -31,6 +53,17 @@ namespace Compilers.Interpreter
 
         public override string VisitProcedureCall(ProcedureCallNode procedureCall)
         {
+            var param = "";
+            if (procedureCall.Parameters.Any())
+            {
+                foreach (var procedureCallParameter in procedureCall.Parameters)
+                {
+                    param += VisitNode(procedureCallParameter);
+                    param += ",";
+                }
+
+                param = param.Remove(param.Length - 1);
+            }
             if (procedureCall.ProcedureName.ToUpper() == "WRITELN")
             {
                 var assembly = "using System;";
@@ -38,24 +71,11 @@ namespace Compilers.Interpreter
                 {
                     _assembliesCalled.Add(assembly);
                 }
-
-                var param = "";
-                if (procedureCall.Parameters.Any())
-                {
-                    foreach (var procedureCallParameter in procedureCall.Parameters)
-                    {
-                        param += VisitNode(procedureCallParameter);
-                        param += ",";
-                    }
-
-                    param = param.Remove(param.Length - 1);
-                }
-               
                 
-                return $"{AddSpaces(4)}Console.WriteLine({param});\r\n";
+                return $"{AddSpaces()}Console.WriteLine({param});\r\n";
             }
 
-            return "";
+            return $"{AddSpaces()}{procedureCall.ProcedureName}({param});\r\n";
         }
         
 
@@ -101,9 +121,11 @@ namespace Compilers.Interpreter
             var zero = new ScopedSymbolTable(program.ProgramName);
             PascalSemanticAnalyzer.DefineBuiltIns(zero);
             CurrentScope = zero;
-            name = "Main";
-            type = "void";
-            var block = VisitBlock(program.Block);
+            var block = "{\r\n";
+            indentLevel++;
+            block += VisitBlock(program.Block);
+            indentLevel--;
+            block += "}\r\n";
             var assems = "";
 
             foreach (var s in _assembliesCalled)
@@ -114,10 +136,12 @@ namespace Compilers.Interpreter
             var str = $"{assems}public static class {program.ProgramName}\r\n{block}\r\n";
             return str.Trim();
         }
+
+        private int indentLevel;
         string AddSpaces(int add = 0)
         {
             var spaces = "";
-            for (int i = 0; i < (CurrentScope.ScopeLevel * 4) + add; i++)
+            for (int i = 0; i < (indentLevel * 4) + add; i++)
             {
                 spaces += " ";
             }
@@ -132,19 +156,44 @@ namespace Compilers.Interpreter
 
         public override string VisitBlock(BlockNode block)
         {
-            var str = AddSpaces() + "{\r\n";
-            CurrentScope = new ScopedSymbolTable(name,  CurrentScope);
-            str += $"{VisitNodes(block.Declarations)}{VisitCompoundStatement(block.CompoundStatement)}";
-            CurrentScope = CurrentScope.ParentScope;
-            str += AddSpaces() + "}\r\n";
+            var str = "";
+
+            if (block.Annotations.ContainsKey("Main"))
+            {
+                str += VisitNodes(block.Declarations);
+                str += $"{AddSpaces()}public static void Main()\r\n" + AddSpaces() + "{\r\n";
+                indentLevel++;
+                //CurrentScope = new ScopedSymbolTable(name, CurrentScope);
+
+                str += VisitCompoundStatement(block.CompoundStatement);
+                //CurrentScope = CurrentScope.ParentScope;
+                indentLevel--;
+                str += AddSpaces() + "}\r\n";
+            }
+            else
+            {
+                str += AddSpaces() + "{\r\n";
+               // CurrentScope = new ScopedSymbolTable(name, CurrentScope);
+               indentLevel++;
+                str += VisitNodes(block.Declarations);
+                str += VisitCompoundStatement(block.CompoundStatement);
+                //CurrentScope = CurrentScope.ParentScope;
+                indentLevel--;
+                str += AddSpaces() + "}\r\n";
+            }
+           // var str = AddSpaces() + "{\r\n";
+           // str += $"{VisitNodes(block.Declarations)}{VisitCompoundStatement(block.CompoundStatement)}";
+            //str += AddSpaces() + "}\r\n";
             return str;
         }
 
         private string type;
         private string name;
+
         public override string VisitCompoundStatement(CompoundStatementNode compoundStatement)
         {
-            return $"{AddSpaces()}public static {type} {name}()\r\n" + AddSpaces() + "{\r\n" + VisitNodes(compoundStatement.Nodes) + AddSpaces() + "}\r\n";
+            return VisitNodes(compoundStatement.Nodes);
+            // return $"{AddSpaces()}public static {type} {name}()\r\n" + AddSpaces() + "{\r\n" + VisitNodes(compoundStatement.Nodes) + AddSpaces() + "}\r\n";
         }
 
         public override string VisitAssignment(AssignmentNode assignment)
