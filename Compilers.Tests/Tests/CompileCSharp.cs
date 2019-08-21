@@ -13,6 +13,11 @@ namespace Minesweeper.Test.Tests
         public int CompilerServerTimeToLive { get; }
     }
 
+    public class CompileResult
+    {
+        public string Output { get; set; }
+        public bool Compiled { get; set; }
+    }
     public class CompileCSharp
     {
         public static bool CompileExecutable2(string sourceCode, string appName)
@@ -33,9 +38,12 @@ namespace Minesweeper.Test.Tests
             process.StartInfo.RedirectStandardError = true;
             process.Start();
             process.WaitForExit();
-
-            var output = process.StandardError.ReadToEnd();
-            Console.Write(output);
+            using (var reader = process.StandardError)
+            {
+                var output = reader.ReadToEnd();
+                Console.Write(output);
+            }
+            
             if (process.ExitCode != 0)
             {
                 return false;

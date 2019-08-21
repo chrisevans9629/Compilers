@@ -23,7 +23,7 @@ namespace Compilers.Interpreter
             return integer.Value.ToString();
         }
 
-        
+
 
         public override string VisitEqualExpression(EqualExpression equalExpression)
         {
@@ -34,11 +34,11 @@ namespace Compilers.Interpreter
         {
             var str = "";
             str += $"{AddSpaces()}if({VisitNode(ifStatement.IfCheck)})\r\n";
-            str += $"{VisitNode(ifStatement.IfTrue)}";
+            str += $"{VisitNode(ifStatement.IfTrue)};\r\n";
             if (ifStatement.IfFalse != null)
             {
                 str += $"{AddSpaces()}else\r\n";
-                str += $"{VisitNode(ifStatement.IfFalse)}\r\n";
+                str += $"{VisitNode(ifStatement.IfFalse)};\r\n";
             }
 
             return str;
@@ -69,8 +69,8 @@ namespace Compilers.Interpreter
 
             if (procedureDeclaration.Annotations.ContainsKey("Nested"))
             {
-                str = str.Remove(str.Length - 2);
-                str += ";\r\n";
+                //str = str.Remove(str.Length - 2);
+                //str += ";\r\n";
             }
             //CurrentScope = CurrentScope.ParentScope;
             current = symbols.ParentScope;
@@ -126,8 +126,8 @@ namespace Compilers.Interpreter
 
             if (procedureDeclaration.Annotations.ContainsKey("Nested"))
             {
-                str = str.Remove(str.Length - 2);
-                str += ";\r\n";
+               // str = str.Remove(str.Length - 2);
+               // str += ";\r\n";
             }
             //CurrentScope = CurrentScope.ParentScope;
             current = symbols.ParentScope;
@@ -156,10 +156,10 @@ namespace Compilers.Interpreter
                     _assembliesCalled.Add(assembly);
                 }
 
-                return $"{AddSpaces()}Console.WriteLine({param});\r\n";
+                return $"{AddSpaces()}Console.WriteLine({param})";
             }
 
-            return $"{AddSpaces()}{procedureCall.ProcedureName}({param});\r\n";
+            return $"{AddSpaces()}{procedureCall.ProcedureName}({param})";
         }
 
         public override string VisitFunctionCall(CallNode functionCall)
@@ -187,7 +187,7 @@ namespace Compilers.Interpreter
             //    return $"{AddSpaces()}Console.WriteLine({param});\r\n";
             //}
 
-            return $"{AddSpaces()}{procedureCall.Name}({param});\r\n";
+            return $"{AddSpaces()}{procedureCall.Name}({param})";
         }
         public override string VisitBinaryOperator(BinaryOperator binary)
         {
@@ -223,7 +223,7 @@ namespace Compilers.Interpreter
             {
                 typeValue = "bool";
             }
-            return $"{AddSpaces()}static {typeValue} {varDeclaration.VarNode.VariableName};\r\n";
+            return $"{AddSpaces()}static {typeValue} {varDeclaration.VarNode.VariableName};";
         }
 
         public override string VisitProgram(PascalProgramNode program)
@@ -270,7 +270,7 @@ namespace Compilers.Interpreter
 
             if (block.Annotations.ContainsKey("Main"))
             {
-                str += VisitNodes(block.Declarations);
+                str += VisitNodes(block.Declarations, false);
                 str += $"{AddSpaces()}public static void Main()\r\n" + AddSpaces() + "{\r\n";
                 indentLevel++;
                 //CurrentScope = new ScopedSymbolTable(name, CurrentScope);
@@ -285,11 +285,11 @@ namespace Compilers.Interpreter
                 str += AddSpaces() + "{\r\n";
                 // CurrentScope = new ScopedSymbolTable(name, CurrentScope);
                 indentLevel++;
-                str += VisitNodes(block.Declarations);
+                str += VisitNodes(block.Declarations, true);
                 str += VisitCompoundStatement(block.CompoundStatement);
                 //CurrentScope = CurrentScope.ParentScope;
                 indentLevel--;
-                str += AddSpaces() + "}\r\n";
+                str += AddSpaces() + "}";
             }
             // var str = AddSpaces() + "{\r\n";
             // str += $"{VisitNodes(block.Declarations)}{VisitCompoundStatement(block.CompoundStatement)}";
@@ -302,7 +302,7 @@ namespace Compilers.Interpreter
 
         public override string VisitCompoundStatement(CompoundStatementNode compoundStatement)
         {
-            return VisitNodes(compoundStatement.Nodes);
+            return VisitNodes(compoundStatement.Nodes, true);
             // return $"{AddSpaces()}public static {type} {name}()\r\n" + AddSpaces() + "{\r\n" + VisitNodes(compoundStatement.Nodes) + AddSpaces() + "}\r\n";
         }
 
@@ -310,22 +310,24 @@ namespace Compilers.Interpreter
         {
             if (assignment.Annotations.ContainsKey("Return"))
             {
-                return $"{AddSpaces()}return {VisitNode(assignment.Right)};\r\n";
+                return $"{AddSpaces()}return {VisitNode(assignment.Right)}";
             }
-            return $"{AddSpaces()}{VisitVariableOrFunctionCall(assignment.Left)} = {VisitNode(assignment.Right)};\r\n";
+            return $"{AddSpaces()}{VisitVariableOrFunctionCall(assignment.Left)} = {VisitNode(assignment.Right)}";
         }
-        
+
         public override string VisitVariableOrFunctionCall(VariableOrFunctionCall call)
         {
             return current.GetName(call.VariableName);
         }
 
-        private string VisitNodes(IList<Node> blockDeclarations)
+        private string VisitNodes(IList<Node> blockDeclarations, bool addSemiColon)
         {
             var str = "";
+            var semi = addSemiColon ? ";" : "";
             foreach (var blockDeclaration in blockDeclarations)
             {
-                str += VisitNode(blockDeclaration);
+                if (blockDeclaration is NoOp != true)
+                    str += VisitNode(blockDeclaration) + $"{semi}\r\n";
             }
             return str;
         }

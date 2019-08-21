@@ -107,9 +107,9 @@ public static class HelloWorld
             var node = ast.Evaluate(tokens);
             table.CheckSyntax(node);
             var result = cSharp.VisitNode(node).Trim();
-            result.Should().Be(output.Trim());
+            //result.Should().Be(output.Trim());
 
-            //CompileCSharp.CompileExecutable2(output, "test").Should().BeTrue();
+            CompileCSharp.CompileExecutable2(output, "test").Should().BeTrue();
         }
     }
 }
