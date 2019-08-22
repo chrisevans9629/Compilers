@@ -65,6 +65,8 @@ namespace Compilers.Symbols
                 new ParameterNode(new VarDeclarationNode(new VariableOrFunctionCall(new TokenItem() {Value = "x4"}),
                     new TypeNode(new TokenItem() {Value = PascalTerms.Char}))),
             }));
+
+            
             levelZero.Define(new ProcedureDeclarationSymbol("WriteLn", new List<ParameterNode>()
             {
                 new ParameterNode(new VarDeclarationNode(new VariableOrFunctionCall(new TokenItem() {Value = "x1"}),
@@ -73,6 +75,15 @@ namespace Compilers.Symbols
                     new TypeNode(new TokenItem() {Value = PascalTerms.Char}))),
             }));
             levelZero.Define(new ProcedureDeclarationSymbol("WriteLn", new List<ParameterNode>()
+            {
+                new ParameterNode(new VarDeclarationNode(new VariableOrFunctionCall(new TokenItem() {Value = "x1"}),
+                    new TypeNode(new TokenItem() {Value = PascalTerms.Char}))),
+            }));
+
+            levelZero.Define(new ProcedureDeclarationSymbol("ReadLn", new List<ParameterNode>()
+            {
+            }));
+            levelZero.Define(new ProcedureDeclarationSymbol("ReadLn", new List<ParameterNode>()
             {
                 new ParameterNode(new VarDeclarationNode(new VariableOrFunctionCall(new TokenItem() {Value = "x1"}),
                     new TypeNode(new TokenItem() {Value = PascalTerms.Char}))),

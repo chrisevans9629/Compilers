@@ -159,6 +159,26 @@ namespace Compilers.Interpreter
                 return $"{AddSpaces()}Console.WriteLine({param})";
             }
 
+            if (procedureCall.ProcedureName.ToUpper() == "READLN")
+            {
+                var assembly = "using System;";
+                if (_assembliesCalled.Contains(assembly) != true)
+                {
+                    _assembliesCalled.Add(assembly);
+                }
+
+                if (procedureCall.Parameters.Count > 1)
+                {
+                    
+                    throw new SemanticException(ErrorCode.Runtime,procedureCall.Token, "cannot have more than one parameter");
+                }
+                if (procedureCall.Parameters.Any())
+                {
+                    return $"{AddSpaces()}{param} = Console.ReadLine()";
+                }
+                return $"{AddSpaces()}Console.ReadLine()";
+            }
+
             return $"{AddSpaces()}{procedureCall.ProcedureName}({param})";
         }
 
@@ -231,7 +251,9 @@ namespace Compilers.Interpreter
             //CurrentScope = zero;
             var block = "{\r\n";
             indentLevel++;
+            current = program.Annotations["SymbolTable"] as ScopedSymbolTable;
             block += VisitBlock(program.Block);
+            current = current.ParentScope;
             indentLevel--;
             block += "}\r\n";
             var assems = "";
@@ -313,6 +335,15 @@ namespace Compilers.Interpreter
 
         public override string VisitVariableOrFunctionCall(VariableOrFunctionCall call)
         {
+            //if (call.VariableName.ToUpper() == "WRITELN")
+            //{
+            //    return "Console.WriteLine()";
+            //}
+
+            //if (call.VariableName.ToUpper() == "READLN")
+            //{
+            //    return "Console.ReadLine()";
+            //}
             return current.GetName(call.VariableName);
         }
 

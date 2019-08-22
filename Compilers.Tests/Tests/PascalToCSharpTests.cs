@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using Compilers.Ast;
 using Compilers.Interpreter;
@@ -129,6 +130,24 @@ end.";
             result.Should().Contain("static char t;");
         }
 
+        [TestCase(@"
+program test;
+begin
+    ReadLn;
+end.", "Console.ReadLine();")]
+        [TestCase(@"
+program test;
+var t : string;
+begin
+    readln(t);
+end.","t = Console.ReadLine();")]
+        public void ReadLn_Should_ContainConsoleReadLine(string input, string contain)
+        {
+            var str = Convert(input);
+            str.Should().Contain(contain);
+            
+        }
+
         [Test]
         public void VariableInFunction_Should_NotBeStatic()
         {
@@ -145,12 +164,18 @@ begin
     writeln(test());
     writeln('test');
 end.";
+            var result = Convert(input);
+
+            result.Should().Contain("int as;").And.NotContain("static int as;");
+        }
+
+        private string Convert(string input)
+        {
             var tokens = lexer.Tokenize(input);
             var node = ast.Evaluate(tokens);
             table.CheckSyntax(node);
             var result = cSharp.VisitNode(node);
-
-            result.Should().Contain("int as;").And.NotContain("static int as;");
+            return result;
         }
     }
 
