@@ -18,7 +18,7 @@ namespace Compilers.Ast
 
         public override string Display()
         {
-            return $"Unary({TokenItem.Value} {Value.Display()})";
+            return $"Unary({TokenItem?.Value} {Value?.Display()})";
         }
     }
 }

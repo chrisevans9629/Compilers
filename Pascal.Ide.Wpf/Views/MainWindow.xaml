@@ -27,18 +27,21 @@
             <Button Content="Start" Command="{Binding StartCommand}" Width="100"/>
             <Button Content="Open" Command="{Binding OpenCommand}" Width="100"></Button>
         </StackPanel>
-        <TabControl
+        <Grid
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Grid.Row="1"
             Margin="10" 
             >
-            <TabItem Header="FastCode">
-                <WindowsFormsHost >
-                    <fctb:FastColoredTextBox x:Name="FastColoredTextBox"></fctb:FastColoredTextBox>
-                </WindowsFormsHost>
-            </TabItem>
-        </TabControl>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <WindowsFormsHost  >
+                <fctb:FastColoredTextBox x:Name="FastColoredTextBox"></fctb:FastColoredTextBox>
+            </WindowsFormsHost>
+            <TextBlock Background="{StaticResource PanelColor}" FontSize="18" Foreground="White" Grid.Column="1" Text="{Binding CSharpCode}"></TextBlock>
+        </Grid>
         <TabControl Grid.Row="1" Grid.Column="2" Background="{StaticResource PanelColor}">
             <TabItem Header="New">
                 <TreeView  ItemsSource="{Binding AbstractSyntaxTree.Children}">
@@ -61,7 +64,7 @@
                 </ScrollViewer>
             </TabItem>
         </TabControl>
-        
+
         <TabControl
             Grid.Row="2"
             Grid.Column="0" 

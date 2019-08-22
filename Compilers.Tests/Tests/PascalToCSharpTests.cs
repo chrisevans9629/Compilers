@@ -111,5 +111,49 @@ public static class HelloWorld
 
             CompileCSharp.CompileExecutable2(output, "test").Should().BeTrue();
         }
+
+
+        [Test]
+        public void VariableGlobal_Should_HaveStatic()
+        {
+            var input = @"
+program test;
+var t : CHAR;
+begin
+end.";
+            var tokens = lexer.Tokenize(input);
+            var node = ast.Evaluate(tokens);
+            table.CheckSyntax(node);
+            var result = cSharp.VisitNode(node);
+
+            result.Should().Contain("static char t;");
+        }
+
+        [Test]
+        public void VariableInFunction_Should_NotBeStatic()
+        {
+            var input = @"
+program test;
+var t : CHAR;
+function test() : integer;
+var as : integer;
+begin
+    test := 1;
+end;
+begin
+    writeln('hello world');
+    writeln(test());
+    writeln('test');
+end.";
+            var tokens = lexer.Tokenize(input);
+            var node = ast.Evaluate(tokens);
+            table.CheckSyntax(node);
+            var result = cSharp.VisitNode(node);
+
+            result.Should().Contain("int as;").And.NotContain("static int as;");
+        }
     }
+
+
+    
 }

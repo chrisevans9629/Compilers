@@ -150,6 +150,12 @@ namespace Pascal.Ide.Wpf.ViewModels
             set => SetProperty(ref _selectedCompiler, value);
         }
 
+        public string CSharpCode
+        {
+            get => _cSharpCode;
+            set => SetProperty(ref _cSharpCode, value);
+        }
+
         private void Start()
         {
             if (Errors.Any())
@@ -173,7 +179,6 @@ namespace Pascal.Ide.Wpf.ViewModels
 
                 if (SelectedCompiler == CompilerCSharp)
                 {
-                    var csharp = new PascalToCSharp();
                     var result = csharp.VisitNode(AbstractSyntaxTree);
                     Output = result;
                 }
@@ -184,10 +189,11 @@ namespace Pascal.Ide.Wpf.ViewModels
                 Errors.Add(e);
             }
         }
-
+        PascalToCSharp csharp = new PascalToCSharp();
         private IList<TokenItem> Tokens;
         private ObservableCollection<string> _compilers;
         private string _selectedCompiler;
+        private string _cSharpCode;
         public const string CodeKey = "Code";
 
         string ExStr(Exception e)
@@ -209,6 +215,8 @@ namespace Pascal.Ide.Wpf.ViewModels
                 Errors.AddRange(astResult.Errors);
                 var anResult = analyzer.CheckSyntaxResult(AbstractSyntaxTree);
                 Errors.AddRange(anResult.Errors);
+                CSharpCode = csharp.VisitNode(anResult.Result.Node);
+
             }
             catch (PascalException e)
             {

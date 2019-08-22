@@ -194,6 +194,10 @@ namespace Compilers.Interpreter
             return $"{VisitNode(binary.Left)} {binary.Name} {VisitNode(binary.Right)}";
         }
 
+        public override string VisitUnary(UnaryOperator unary)
+        {
+            return unary.Name + VisitNode(unary.Value);
+        }
 
         public override string VisitString(StringNode str)
         {
@@ -209,21 +213,15 @@ namespace Compilers.Interpreter
         public override string VisitVarDeclaration(VarDeclarationNode varDeclaration)
         {
             var typeValue = varDeclaration.TypeNode.TypeValue.ToUpper();
-            if (PascalTerms.Int == typeValue)
-            {
-                typeValue = "int";
-            }
 
-            if (PascalTerms.Real == typeValue)
-            {
-                typeValue = "double";
-            }
 
-            if (PascalTerms.Boolean == typeValue)
+            typeValue = this.typesConverter.GetTypeName(typeValue);
+            if (varDeclaration.Annotations.ContainsKey("Global"))
             {
-                typeValue = "bool";
+                return $"{AddSpaces()}static {typeValue} {varDeclaration.VarNode.VariableName};";
             }
-            return $"{AddSpaces()}static {typeValue} {varDeclaration.VarNode.VariableName};";
+            return $"{AddSpaces()}{typeValue} {varDeclaration.VarNode.VariableName}";
+
         }
 
         public override string VisitProgram(PascalProgramNode program)
@@ -297,8 +295,6 @@ namespace Compilers.Interpreter
             return str;
         }
 
-        private string type;
-        private string name;
 
         public override string VisitCompoundStatement(CompoundStatementNode compoundStatement)
         {

@@ -11,6 +11,8 @@ namespace Compilers.Interpreter
             types = new Dictionary<string, string>();
             types.Add(PascalTerms.Int, "int");
             types.Add(PascalTerms.Real, "double");
+            types.Add(PascalTerms.Char, "char");
+            types.Add(PascalTerms.String, "string");
         }
         public string GetTypeName(string pascalType)
         {

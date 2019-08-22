@@ -196,7 +196,7 @@ namespace Compilers.Symbols
         }
         private AnnotatedNode CheckTypeMatch(TokenItem tokenItem, AnnotatedNode left, AnnotatedNode right, Node nodeForLog, bool twoWayConversion = true)
         {
-            if (GetBuiltInType(left.Symbol) is BuiltInTypeSymbol a && GetBuiltInType(right.Symbol) is BuiltInTypeSymbol b)
+            if (GetBuiltInType(left?.Symbol) is BuiltInTypeSymbol a && GetBuiltInType(right?.Symbol) is BuiltInTypeSymbol b)
             {
                 if (a.Name == b.Name)
                 {
@@ -576,6 +576,10 @@ namespace Compilers.Symbols
 
         public AnnotatedNode VisitVarDeclaration(VarDeclarationNode node)
         {
+            if (CurrentScope.ScopeLevel <= 1)
+            {
+                node.Annotations.Add("Global", null);
+            }
             var typeName = node.TypeNode.TypeValue;
             var varName = node.VarNode.VariableName;
             return new AnnotatedNode(node) { Symbol = DefineVariableSymbol(node.VarNode.TokenItem, varName, typeName) };
