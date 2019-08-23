@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compilers", "Compilers\Compilers.csproj", "{B9A9DD34-43AA-4EAB-B38D-5616AA00DFCD}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILTestProject", "ILTestProject\ILTestProject.csproj", "{665400F6-2D30-44BE-BB31-33F5B74A0D31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pascal.Ide.Wpf", "Pascal.Ide.Wpf\Pascal.Ide.Wpf.csproj", "{751EDF03-D073-45C7-AC67-566F283DFCC7}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Repl", "Repl\Repl.fsproj", "{122145C2-CEF1-4E8E-9FE8-0B6E14DA56EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{751EDF03-D073-45C7-AC67-566F283DFCC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{751EDF03-D073-45C7-AC67-566F283DFCC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{751EDF03-D073-45C7-AC67-566F283DFCC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{122145C2-CEF1-4E8E-9FE8-0B6E14DA56EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{122145C2-CEF1-4E8E-9FE8-0B6E14DA56EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{122145C2-CEF1-4E8E-9FE8-0B6E14DA56EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{122145C2-CEF1-4E8E-9FE8-0B6E14DA56EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
