@@ -2,6 +2,12 @@
 
 This is a project that tests compilers.  It has a pascal IDE that converts pascal code into c#
 
+## IDE
+
+![](pascal.png)
+
+![](pascalerror.png)
+
 ### Resources
 Below are some of the resources I used.  Hopefully these can give you some pointers on building your own stuff!
 https://www.tutorialspoint.com/compiler_design/compiler_design_quick_guide

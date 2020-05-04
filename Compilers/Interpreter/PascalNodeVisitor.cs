@@ -77,6 +77,7 @@ namespace Compilers.Interpreter
 
         public virtual T VisitForLoop(ForLoopNode forLoop)
         {
+            
             throw new NotImplementedException();
         }
 
