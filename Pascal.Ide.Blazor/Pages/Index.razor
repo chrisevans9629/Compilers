@@ -1,7 +1,101 @@
 ﻿@page "/"
+@using Compilers.Ast;
+@using Compilers.Interpreter;
+@using Compilers.Symbols;
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <div class="container m-4">
+        <div class="row">
+            <div class="col">
+                <textarea @bind-value="@PascalCode" @bind-value:event="oninput"></textarea>
+            </div>
+            <div class="col">
+                <pre><code>@CSharpCode</code></pre>
+            </div>
+            <div class="col">
+                @foreach (var node in Tree.Children)
+                {
+                    
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <ul>
+                    @foreach (var error in ErrorMessage)
+                    {
+                        <li>
+                            @error.ToString();
+                        </li>
+                    }
+
+                </ul>
+            </div>
+            <div class="col">
+                <pre>@Output</pre>
+            </div>
+        </div>
+
+    </div>
+
+
+    @code {
+        PascalLexer lexer = new PascalLexer();
+        PascalAst ast = new PascalAst();
+        PascalSemanticAnalyzer analyzer = new PascalSemanticAnalyzer();
+        PascalToCSharp csharp = new PascalToCSharp();
+
+        public Node Tree { get; set; }
+
+        private string _pascalCode;
+
+        public string PascalCode
+        {
+            get => _pascalCode;
+            set
+            {
+                _pascalCode = value;
+                Compile();
+            }
+        }
+        public string CSharpCode { get; set; }
+        public List<PascalException> ErrorMessage { get; set; } = new List<PascalException>();
+        public string Output { get; set; }
+        public void Compile()
+        {
+            ErrorMessage.Clear();
+            var con = new ConsoleModel();
+            PascalInterpreter interpreter = new PascalInterpreter(console: con);
+
+            var tokens = lexer.TokenizeResult(PascalCode);
+
+            ErrorMessage.AddRange(tokens.Errors);
+
+            var tree = ast.EvaluateResult(tokens.Result);
+            Tree = tree.Result;
+            ErrorMessage.AddRange(tree.Errors);
+            var symbols = analyzer.CheckSyntaxResult(tree.Result);
+
+            ErrorMessage.AddRange(symbols.Errors);
+
+            CSharpCode = csharp.VisitNode(tree.Result);
+
+            interpreter.Interpret(tree.Result);
+
+            Output = con.Output;
+
+            this.StateHasChanged();
+        }
+
+        protected override void OnInitialized()
+        {
+            PascalCode = @"program test;
+begin
+    writeln(10);
+end.";
+            Compile();
+            base.OnInitialized();
+        }
+
+    }
