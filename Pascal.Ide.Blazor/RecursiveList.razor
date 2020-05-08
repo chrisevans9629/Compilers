@@ -1,0 +1,19 @@
+﻿
+<div style="padding-left: 10px">
+    <p>@Tree.GetTypeName</p>
+    <ul>
+        @foreach (var item in Tree.Children)
+        {
+            <li>@item.GetTypeName</li>
+            <RecursiveList Tree="item"></RecursiveList>
+        }
+    </ul>
+  
+
+</div>
+
+
+@code {
+    [Parameter]
+    public Compilers.Ast.Node Tree { get; set; } 
+}
