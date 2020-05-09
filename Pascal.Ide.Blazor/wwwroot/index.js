@@ -31,16 +31,13 @@ $("textarea").keydown(function (e) {
     }
 });
 
-function SetupEditor() {
+function SetupEditor(obj) {
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/pascal");
     editor.session.on('change', function (delta) {
-
+        obj.invokeMethodAsync("EditorChanged", editor.getValue());
     });
 }
 
-function GetEditorValue() {
-    return editor.getValue();
-}
 

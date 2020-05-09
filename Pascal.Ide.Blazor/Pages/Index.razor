@@ -3,6 +3,7 @@
 @using Compilers.Interpreter;
 @using Compilers.Symbols;
 @inject IJSRuntime JsRuntime;
+@implements IDisposable;
 
 
 <div class="container m-4">
@@ -111,18 +112,19 @@
     }
 
     [JSInvokable]
-    public static void EditorChanged()
+    public void EditorChanged(string code)
     {
-
+        PascalCode = code;
         //Compile();
     }
-
+    DotNetObjectReference<Index> Reference;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            await JsRuntime.InvokeVoidAsync("SetupEditor");
+            Reference = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("SetupEditor", Reference);
         }
     }
 
@@ -135,5 +137,9 @@ end.";
         Compile();
         base.OnInitialized();
     }
-
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        Reference?.Dispose();
+    }
 }
