@@ -40,3 +40,6 @@ https://stackoverflow.com/questions/553143/compiling-executing-a-c-sharp-source-
 Using the CodeDom with roslyn
 https://docs.microsoft.com/en-us/dotnet/api/microsoft.csharp.csharpcodeprovider?view=netframework-4.8
 
+## Blazor
+
+https://blazor-university.com/javascript-interop/calling-dotnet-from-javascript/

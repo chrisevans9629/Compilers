@@ -5,11 +5,13 @@
 @inject IJSRuntime JsRuntime;
 
 
-
 <div class="container m-4">
     <div class="row">
         <div class="col">
-            <textarea @bind-value="@PascalCode" @bind-value:event="oninput"></textarea>
+            <div id="editor">
+                @PascalCode
+            </div>
+            @*<textarea @bind-value="@PascalCode" @bind-value:event="oninput"></textarea>*@
         </div>
         <div class="col">
             <ul class="nav nav-tabs" id="myTab">
@@ -115,7 +117,16 @@
         //Compile();
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("SetupEditor");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
     {
         PascalCode = @"program test;
 begin

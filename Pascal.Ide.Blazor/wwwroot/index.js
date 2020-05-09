@@ -1,0 +1,46 @@
+﻿var BlazorUniversity = BlazorUniversity || {};
+BlazorUniversity.startRandomGenerator = function (dotNetObject) {
+    setInterval(function () {
+        let text = Math.random() * 1000;
+        console.log("JS: Generated " + text);
+        dotNetObject.invokeMethodAsync('AddText', text.toString());
+    }, 1000);
+};
+
+
+
+
+$("textarea").keydown(function (e) {
+    if (e.keyCode === 9) { // tab was pressed
+        // get caret position/selection
+        var start = this.selectionStart;
+        end = this.selectionEnd;
+
+        var $this = $(this);
+
+        // set textarea value to: text before caret + tab + text after caret
+        $this.val($this.val().substring(0, start)
+            + "\t"
+            + $this.val().substring(end));
+
+        // put caret at right position again
+        this.selectionStart = this.selectionEnd = start + 1;
+
+        // prevent the focus lose
+        return false;
+    }
+});
+
+function SetupEditor() {
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/pascal");
+    editor.session.on('change', function (delta) {
+
+    });
+}
+
+function GetEditorValue() {
+    return editor.getValue();
+}
+
