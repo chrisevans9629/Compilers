@@ -42,4 +42,8 @@ https://docs.microsoft.com/en-us/dotnet/api/microsoft.csharp.csharpcodeprovider?
 
 ## Blazor
 
+Js Interlop
 https://blazor-university.com/javascript-interop/calling-dotnet-from-javascript/
+
+Code Editor
+https://ace.c9.io/#nav=howto

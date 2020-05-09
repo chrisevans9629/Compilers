@@ -11,7 +11,10 @@ namespace Compilers.Interpreter
             Output += str;
         }
 
-       
+        public void Clear()
+        {
+            Output = "";
+        }
 
         public char Read()
         {

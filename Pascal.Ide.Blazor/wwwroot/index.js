@@ -1,14 +1,4 @@
-﻿var BlazorUniversity = BlazorUniversity || {};
-BlazorUniversity.startRandomGenerator = function (dotNetObject) {
-    setInterval(function () {
-        let text = Math.random() * 1000;
-        console.log("JS: Generated " + text);
-        dotNetObject.invokeMethodAsync('AddText', text.toString());
-    }, 1000);
-};
-
-
-
+﻿
 
 $("textarea").keydown(function (e) {
     if (e.keyCode === 9) { // tab was pressed
@@ -31,13 +21,23 @@ $("textarea").keydown(function (e) {
     }
 });
 
+var editor = null;
+
 function SetupEditor(obj) {
-    var editor = ace.edit("editor");
+    editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/pascal");
     editor.session.on('change', function (delta) {
         obj.invokeMethodAsync("EditorChanged", editor.getValue());
     });
+
+    obj.invokeMethodAsync("EditorChanged", editor.getValue());
+}
+
+function setEditorValue(str) {
+    if (editor == null)
+        return;
+    editor.setValue(str);
 }
 
 

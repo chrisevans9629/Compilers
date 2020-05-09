@@ -1,19 +1,24 @@
 ﻿@page "/"
-@using Compilers.Ast;
-@using Compilers.Interpreter;
-@using Compilers.Symbols;
-@inject IJSRuntime JsRuntime;
-@implements IDisposable;
-
+@inherits IndexBase;
 
 <div class="container m-4">
     <div class="row">
         <div class="col">
-            <div id="editor">
-                @PascalCode
-            </div>
-            @*<textarea @bind-value="@PascalCode" @bind-value:event="oninput"></textarea>*@
+            <label>Example</label>
+            <select @onchange="@SelectedExampleChanged">
+                @foreach (var ex in Examples)
+                {
+                    <option>@ex.Key</option>
+                }
+            </select>
         </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <pre id="editor">
+            </pre>
+        </div>
+
         <div class="col">
             <ul class="nav nav-tabs" id="myTab">
                 <li class="nav-item">
@@ -46,14 +51,18 @@
     <li class="nav-item">
         <a class="nav-link" data-toggle="tab" href="#output">Output</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#build">Build</a>
+    </li>
 </ul>
+
 <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="errors">
         <ul class="error-list">
             @foreach (var error in ErrorMessage)
             {
                 <li>
-                    @error.ToString();
+                    <p>@error</p>
                 </li>
             }
         </ul>
@@ -61,85 +70,8 @@
     <div class="tab-pane fade " id="output">
         <pre>@Output</pre>
     </div>
+    <div class="tab-pane fade" id="build">
+        <pre>@Build</pre>
+    </div>
 </div>
 
-@code {
-    PascalLexer lexer = new PascalLexer();
-    PascalAst ast = new PascalAst();
-    PascalSemanticAnalyzer analyzer = new PascalSemanticAnalyzer();
-    PascalToCSharp csharp = new PascalToCSharp();
-
-    public Node Tree { get; set; }
-
-    private string _pascalCode;
-
-    public string PascalCode
-    {
-        get => _pascalCode;
-        set
-        {
-            _pascalCode = value;
-            Compile();
-        }
-    }
-    public string CSharpCode { get; set; }
-    public List<PascalException> ErrorMessage { get; set; } = new List<PascalException>();
-    public string Output { get; set; }
-    public void Compile()
-    {
-        ErrorMessage.Clear();
-        var con = new ConsoleModel();
-        PascalInterpreter interpreter = new PascalInterpreter(console: con);
-
-        var tokens = lexer.TokenizeResult(PascalCode);
-
-        ErrorMessage.AddRange(tokens.Errors);
-
-        var tree = ast.EvaluateResult(tokens.Result);
-        Tree = tree.Result;
-        ErrorMessage.AddRange(tree.Errors);
-        var symbols = analyzer.CheckSyntaxResult(tree.Result);
-
-        ErrorMessage.AddRange(symbols.Errors);
-
-        CSharpCode = csharp.VisitNode(tree.Result);
-
-        interpreter.Interpret(tree.Result);
-
-        Output = con.Output;
-
-        this.StateHasChanged();
-    }
-
-    [JSInvokable]
-    public void EditorChanged(string code)
-    {
-        PascalCode = code;
-        //Compile();
-    }
-    DotNetObjectReference<Index> Reference;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            Reference = DotNetObjectReference.Create(this);
-            await JsRuntime.InvokeVoidAsync("SetupEditor", Reference);
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        PascalCode = @"program test;
-begin
-writeln(10);
-end.";
-        Compile();
-        base.OnInitialized();
-    }
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        Reference?.Dispose();
-    }
-}
