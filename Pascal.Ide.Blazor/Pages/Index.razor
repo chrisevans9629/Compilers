@@ -1,7 +1,9 @@
 ﻿@page "/"
 @inherits IndexBase;
 
-<div class="container m-4">
+
+<div class="main">
+
     <div class="row">
         <div class="col">
             <label>Example</label>
@@ -13,65 +15,74 @@
             </select>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
+    <div class="row no-gutters">
+        <div class="col-8">
             <pre id="editor">
             </pre>
+
+            <div class="bottom-tab">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#errors">Errors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#output">Output</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#build">Build</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="errors">
+                        <ul class="error-list">
+                            @foreach (var error in ErrorMessage)
+                            {
+                                <li>
+                                    <p>@error</p>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade " id="output">
+                        <pre>@Output</pre>
+                    </div>
+                    <div class="tab-pane fade" id="build">
+                        <pre>@Build</pre>
+                    </div>
+                </div>
+
+
+            </div>
+
         </div>
 
-        <div class="col">
-            <ul class="nav nav-tabs" id="myTab">
-                <li class="nav-item">
-                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#csharp">CSharp</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#ast">AST</a>
-                </li>
-            </ul>
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="csharp">
-                    <pre><code>@CSharpCode</code></pre>
-                </div>
-                <div class="tab-pane fade " id="ast">
-                    @if (Tree != null)
-                    {
-                        <RecursiveList Tree="Tree"></RecursiveList>
-                    }
+        <div class="col-4">
+            <div class="right-tab">
+                <ul class="nav nav-tabs" id="myTab">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#csharp">CSharp</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#ast">AST</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="csharp">
+                        <pre><code>@CSharpCode</code></pre>
+                    </div>
+                    <div class="tab-pane fade " id="ast">
+                        @if (Tree != null)
+                        {
+                            <RecursiveList Tree="Tree"></RecursiveList>
+                        }
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
+
+
 </div>
-
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item">
-        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#errors">Errors</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#output">Output</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#build">Build</a>
-    </li>
-</ul>
-
-<div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="errors">
-        <ul class="error-list">
-            @foreach (var error in ErrorMessage)
-            {
-                <li>
-                    <p>@error</p>
-                </li>
-            }
-        </ul>
-    </div>
-    <div class="tab-pane fade " id="output">
-        <pre>@Output</pre>
-    </div>
-    <div class="tab-pane fade" id="build">
-        <pre>@Build</pre>
-    </div>
-</div>
-

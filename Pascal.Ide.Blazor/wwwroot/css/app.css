@@ -6,6 +6,28 @@ html, body {
     color: white;
 }
 
+a {
+    color: white;
+}
+
+a:hover {
+    color: black;
+    background-color: white;
+}
+
+.right-tab {
+    align-content:end;
+}
+
+.main {
+    margin: 1%;
+}
+
+.tab-pane {
+    width: 100%;
+    padding: 1%;
+}
+
 #editor {
     top: 0;
     right: 0;
