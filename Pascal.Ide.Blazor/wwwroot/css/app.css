@@ -6,8 +6,12 @@ html, body {
     color: white;
 }
 
+.branch {
+    padding-left: 10%;
+}
+
 textarea {
-    background-color: dimgrey;
+    background-color: black;
     color: white;
     width: 100%;
     min-height: 50vh;
@@ -17,5 +21,9 @@ pre {
     color: white;
     font-family: 'Cascadia Code';
     width: 100%;
+}
+
+.error-list {
+    color: red;
 }
 

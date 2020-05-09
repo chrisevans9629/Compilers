@@ -1,19 +1,17 @@
 ﻿
-<div style="padding-left: 10px">
-    <p>@Tree.GetTypeName</p>
-    <ul>
-        @foreach (var item in Tree.Children)
-        {
-            <li>@item.GetTypeName</li>
-            <RecursiveList Tree="item"></RecursiveList>
-        }
-    </ul>
-  
-
-</div>
-
+@if (Tree != null)
+{
+    <div class="branch">
+        <p>@Tree.GetTypeName</p>
+        @if (Tree.Children != null)
+            @foreach (var item in Tree.Children)
+            {
+                <RecursiveList Tree="item"></RecursiveList>
+            }
+    </div>
+}
 
 @code {
     [Parameter]
-    public Compilers.Ast.Node Tree { get; set; } 
+    public Compilers.Ast.Node Tree { get; set; }
 }

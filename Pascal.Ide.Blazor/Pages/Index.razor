@@ -2,100 +2,127 @@
 @using Compilers.Ast;
 @using Compilers.Interpreter;
 @using Compilers.Symbols;
+@inject IJSRuntime JsRuntime;
 
 
 
-    <div class="container m-4">
-        <div class="row">
-            <div class="col">
-                <textarea @bind-value="@PascalCode" @bind-value:event="oninput"></textarea>
-            </div>
-            <div class="col">
-                <pre><code>@CSharpCode</code></pre>
-            </div>
-            <div class="col">
-                @foreach (var node in Tree.Children)
-                {
-                    
-                }
-            </div>
+<div class="container m-4">
+    <div class="row">
+        <div class="col">
+            <textarea @bind-value="@PascalCode" @bind-value:event="oninput"></textarea>
         </div>
-        <div class="row">
-            <div class="col">
-                <ul>
-                    @foreach (var error in ErrorMessage)
+        <div class="col">
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="nav-item">
+                    <a class="nav-link active" id="home-tab" data-toggle="tab" href="#csharp">CSharp</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#ast">AST</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="csharp">
+                    <pre><code>@CSharpCode</code></pre>
+                </div>
+                <div class="tab-pane fade " id="ast">
+                    @if (Tree != null)
                     {
-                        <li>
-                            @error.ToString();
-                        </li>
+                        <RecursiveList Tree="Tree"></RecursiveList>
                     }
-
-                </ul>
-            </div>
-            <div class="col">
-                <pre>@Output</pre>
+                </div>
             </div>
         </div>
-
     </div>
 
+</div>
 
-    @code {
-        PascalLexer lexer = new PascalLexer();
-        PascalAst ast = new PascalAst();
-        PascalSemanticAnalyzer analyzer = new PascalSemanticAnalyzer();
-        PascalToCSharp csharp = new PascalToCSharp();
-
-        public Node Tree { get; set; }
-
-        private string _pascalCode;
-
-        public string PascalCode
-        {
-            get => _pascalCode;
-            set
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#errors">Errors</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#output">Output</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="errors">
+        <ul class="error-list">
+            @foreach (var error in ErrorMessage)
             {
-                _pascalCode = value;
-                Compile();
+                <li>
+                    @error.ToString();
+                </li>
             }
-        }
-        public string CSharpCode { get; set; }
-        public List<PascalException> ErrorMessage { get; set; } = new List<PascalException>();
-        public string Output { get; set; }
-        public void Compile()
+        </ul>
+    </div>
+    <div class="tab-pane fade " id="output">
+        <pre>@Output</pre>
+    </div>
+</div>
+
+@code {
+    PascalLexer lexer = new PascalLexer();
+    PascalAst ast = new PascalAst();
+    PascalSemanticAnalyzer analyzer = new PascalSemanticAnalyzer();
+    PascalToCSharp csharp = new PascalToCSharp();
+
+    public Node Tree { get; set; }
+
+    private string _pascalCode;
+
+    public string PascalCode
+    {
+        get => _pascalCode;
+        set
         {
-            ErrorMessage.Clear();
-            var con = new ConsoleModel();
-            PascalInterpreter interpreter = new PascalInterpreter(console: con);
-
-            var tokens = lexer.TokenizeResult(PascalCode);
-
-            ErrorMessage.AddRange(tokens.Errors);
-
-            var tree = ast.EvaluateResult(tokens.Result);
-            Tree = tree.Result;
-            ErrorMessage.AddRange(tree.Errors);
-            var symbols = analyzer.CheckSyntaxResult(tree.Result);
-
-            ErrorMessage.AddRange(symbols.Errors);
-
-            CSharpCode = csharp.VisitNode(tree.Result);
-
-            interpreter.Interpret(tree.Result);
-
-            Output = con.Output;
-
-            this.StateHasChanged();
-        }
-
-        protected override void OnInitialized()
-        {
-            PascalCode = @"program test;
-begin
-    writeln(10);
-end.";
+            _pascalCode = value;
             Compile();
-            base.OnInitialized();
         }
-
     }
+    public string CSharpCode { get; set; }
+    public List<PascalException> ErrorMessage { get; set; } = new List<PascalException>();
+    public string Output { get; set; }
+    public void Compile()
+    {
+        ErrorMessage.Clear();
+        var con = new ConsoleModel();
+        PascalInterpreter interpreter = new PascalInterpreter(console: con);
+
+        var tokens = lexer.TokenizeResult(PascalCode);
+
+        ErrorMessage.AddRange(tokens.Errors);
+
+        var tree = ast.EvaluateResult(tokens.Result);
+        Tree = tree.Result;
+        ErrorMessage.AddRange(tree.Errors);
+        var symbols = analyzer.CheckSyntaxResult(tree.Result);
+
+        ErrorMessage.AddRange(symbols.Errors);
+
+        CSharpCode = csharp.VisitNode(tree.Result);
+
+        interpreter.Interpret(tree.Result);
+
+        Output = con.Output;
+
+        this.StateHasChanged();
+    }
+
+    [JSInvokable]
+    public static void EditorChanged()
+    {
+
+        //Compile();
+    }
+
+    protected override void OnInitialized()
+    {
+        PascalCode = @"program test;
+begin
+writeln(10);
+end.";
+        Compile();
+        base.OnInitialized();
+    }
+
+}
